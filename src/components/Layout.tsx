@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { BarChart3, Database, FileText, FolderOpen, LayoutDashboard, Search, Settings, Building2, HardDrive, Cloud } from 'lucide-react'
+import { BarChart3, Database, FileText, FolderOpen, LayoutDashboard, Search, Settings, HardDrive, Cloud } from 'lucide-react'
 import { useStore } from '../store'
 import { Toasts } from './ui'
 
@@ -18,13 +18,10 @@ export function Layout() {
   return (
     <div className="flex min-h-screen">
       <aside className="no-print sticky top-0 flex h-screen w-60 shrink-0 flex-col border-r border-line bg-white">
-        <div className="flex h-14 items-center gap-2 border-b border-line px-4">
-          <span className="flex size-8 items-center justify-center rounded-md bg-brand-700 text-white">
-            <Building2 size={18} />
-          </span>
-          <div className="leading-tight">
-            <div className="text-[13px] font-bold text-brand-800">Казахтелеком</div>
-            <div className="text-[11px] text-slate-500">Закупки</div>
+        <div className="flex h-14 items-center gap-2.5 border-b border-line px-3">
+          <img src={`${import.meta.env.BASE_URL}kt-emblem.png`} alt="Казахтелеком" className="size-9 shrink-0 object-contain" />
+          <div className="text-[12px] leading-tight font-semibold text-brand-800">
+            Система мониторинга стоимости аренды <span className="font-normal whitespace-nowrap text-slate-500">ver 0.1</span>
           </div>
         </div>
         <nav className="flex-1 space-y-0.5 p-2">
