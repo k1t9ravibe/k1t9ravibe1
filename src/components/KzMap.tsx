@@ -58,7 +58,7 @@ export function KzMap({ stats, selected, onSelect }: Props) {
               key={r.name}
               d={r.d}
               fill={fill}
-              stroke={sel ? '#0d2f5c' : tip?.name === r.name ? '#0a5cc2' : '#ffffff'}
+              stroke={sel ? '#29266b' : tip?.name === r.name ? '#4a4fc4' : '#ffffff'}
               strokeWidth={sel ? 3 : tip?.name === r.name ? 2.5 : 1.5}
               strokeLinejoin="round"
               opacity={dim(r.name)}
@@ -68,12 +68,12 @@ export function KzMap({ stats, selected, onSelect }: Props) {
         })}
         {/* Выбранный регион поверх соседей, чтобы обводка не перекрывалась */}
         {selected && KZ_REGIONS.some((r) => r.name === selected) && (
-          <path d={KZ_REGIONS.find((r) => r.name === selected)!.d} fill="none" stroke="#0d2f5c" strokeWidth={3} strokeLinejoin="round" pointerEvents="none" />
+          <path d={KZ_REGIONS.find((r) => r.name === selected)!.d} fill="none" stroke="#29266b" strokeWidth={3} strokeLinejoin="round" pointerEvents="none" />
         )}
         {KZ_REGIONS.map((r) => {
           const s = stats.get(r.name)
           const fill = colorOf(s?.median)
-          const ink = isDark(fill) ? '#ffffff' : '#0f2340'
+          const ink = isDark(fill) ? '#ffffff' : '#1a1838'
           return (
             <g key={r.name} pointerEvents="none" opacity={dim(r.name)} textAnchor="middle" style={{ fontVariantNumeric: 'tabular-nums' }}>
               <text x={r.label[0]} y={r.label[1] - 3} fontSize={14.5} fontWeight={600} fill={ink}>
@@ -91,14 +91,14 @@ export function KzMap({ stats, selected, onSelect }: Props) {
           return (
             <g key={c.name} opacity={dim(c.name)} {...handlers(c.name)}>
               <circle cx={c.at[0]} cy={c.at[1]} r={14} fill="transparent" />
-              <circle cx={c.at[0]} cy={c.at[1]} r={selected === c.name ? 9 : 7.5} fill={colorOf(s?.median)} stroke={selected === c.name ? '#0d2f5c' : '#ffffff'} strokeWidth={2.5} />
+              <circle cx={c.at[0]} cy={c.at[1]} r={selected === c.name ? 9 : 7.5} fill={colorOf(s?.median)} stroke={selected === c.name ? '#29266b' : '#ffffff'} strokeWidth={2.5} />
               <text
                 x={c.at[0] + l.dx}
                 y={c.at[1] + l.dy}
                 textAnchor={l.anchor}
                 fontSize={13.5}
                 fontWeight={600}
-                fill="#0f2340"
+                fill="#1a1838"
                 stroke="#ffffff"
                 strokeWidth={3.5}
                 paintOrder="stroke"

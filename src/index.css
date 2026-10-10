@@ -1,18 +1,19 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-50: #eef5fd;
-  --color-brand-100: #d9e8fa;
-  --color-brand-200: #b7d3f6;
-  --color-brand-300: #86b6ef;
-  --color-brand-400: #3987e5;
-  --color-brand-500: #2a78d6;
-  --color-brand-600: #0a5cc2;
-  --color-brand-700: #0a4ea3;
-  --color-brand-800: #0b3d7e;
-  --color-brand-900: #0d2f5c;
-  --color-line: #d6e4f5;
-  --color-page: #f4f8fd;
+  /* Основной цвет — индиго */
+  --color-brand-50: #eef0fc;
+  --color-brand-100: #e0e3fa;
+  --color-brand-200: #c5cbf5;
+  --color-brand-300: #a3abee;
+  --color-brand-400: #7b85e3;
+  --color-brand-500: #5b63d6;
+  --color-brand-600: #4a4fc4;
+  --color-brand-700: #3d3fa8;
+  --color-brand-800: #322f87;
+  --color-brand-900: #29266b;
+  --color-line: #dcdff3;
+  --color-page: #f5f6fc;
   --color-over: #d03b3b;
   --color-over-bg: #fdeeee;
   --color-ok: #0b8a0b;
@@ -23,7 +24,7 @@
 html,
 body {
   background: var(--color-page);
-  color: #0f2340;
+  color: #1a1838;
 }
 
 .tabular {

@@ -1,4 +1,4 @@
-import type { Workbook, Worksheet } from 'exceljs'
+﻿import type { Workbook, Worksheet } from 'exceljs'
 import { REGION_NAMES } from '../data/regions'
 import { PREMISE_TYPES, type PremiseType } from '../types'
 import { parseNumber } from './format'
@@ -27,11 +27,11 @@ export function download(blob: Blob, filename: string) {
 
 function styleHeader(ws: Worksheet, rowNo: number) {
   const row = ws.getRow(rowNo)
-  row.font = { bold: true, color: { argb: 'FF0B3D7E' } }
+  row.font = { bold: true, color: { argb: 'FF322F87' } }
   row.alignment = { vertical: 'middle', wrapText: true }
   row.eachCell((c) => {
-    c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEEF5FD' } }
-    c.border = { bottom: { style: 'thin', color: { argb: 'FFB7D3F6' } } }
+    c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEEF0FC' } }
+    c.border = { bottom: { style: 'thin', color: { argb: 'FFC5CBF5' } } }
   })
 }
 
@@ -62,7 +62,7 @@ export async function exportRows(sheet: string, headers: string[], rows: Cell[][
 export async function exportReport(opts: { title: string; meta: [string, string][]; headers: string[]; rows: Cell[][]; footer: string[]; filename: string }) {
   const wb = await newWorkbook()
   const ws = wb.addWorksheet('Справка')
-  ws.addRow([opts.title]).font = { bold: true, size: 14, color: { argb: 'FF0B3D7E' } }
+  ws.addRow([opts.title]).font = { bold: true, size: 14, color: { argb: 'FF322F87' } }
   ws.mergeCells(1, 1, 1, opts.headers.length)
   ws.addRow([])
   for (const [k, v] of opts.meta) {

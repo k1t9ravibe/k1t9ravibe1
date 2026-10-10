@@ -22,7 +22,7 @@ const C = {
 }
 
 const axisProps = { tick: { fontSize: 11, fill: C.axis }, axisLine: { stroke: '#c3c2b7' }, tickLine: false } as const
-const tooltipStyle = { contentStyle: { fontSize: 12, borderRadius: 6, border: '1px solid #d6e4f5' }, formatter: (v: unknown) => `${fmtNum(Number(v))} ₸/м²` }
+const tooltipStyle = { contentStyle: { fontSize: 12, borderRadius: 6, border: '1px solid #dcdff3' }, formatter: (v: unknown) => `${fmtNum(Number(v))} ₸/м²` }
 
 export function Analytics() {
   const { db } = useStore()
@@ -162,7 +162,7 @@ export function Analytics() {
               <CartesianGrid horizontal={false} stroke={C.grid} />
               <XAxis type="number" {...axisProps} tickFormatter={(x) => fmtNum(x)} />
               <YAxis type="category" dataKey="name" width={110} {...axisProps} />
-              <Tooltip {...tooltipStyle} cursor={{ fill: '#eef5fd' }} />
+              <Tooltip {...tooltipStyle} cursor={{ fill: '#eef0fc' }} />
               <Legend wrapperStyle={{ fontSize: 12 }} />
               <Bar isAnimationActive={false} dataKey="median" name="Медиана" fill={C.s1} radius={[0, 4, 4, 0]} />
               <Bar isAnimationActive={false} dataKey="mean" name="Средняя" fill={C.s2} radius={[0, 4, 4, 0]} />
@@ -192,7 +192,7 @@ export function Analytics() {
               <CartesianGrid vertical={false} stroke={C.grid} />
               <XAxis dataKey="name" {...axisProps} interval={0} tick={{ fontSize: 10, fill: C.axis }} />
               <YAxis {...axisProps} width={56} tickFormatter={(x) => fmtNum(x)} />
-              <Tooltip {...tooltipStyle} cursor={{ fill: '#eef5fd' }} />
+              <Tooltip {...tooltipStyle} cursor={{ fill: '#eef0fc' }} />
               <Legend wrapperStyle={{ fontSize: 12 }} />
               <Bar isAnimationActive={false} dataKey="median" name="Медиана" fill={C.s1} radius={[4, 4, 0, 0]} />
               <Bar isAnimationActive={false} dataKey="mean" name="Средняя" fill={C.s2} radius={[4, 4, 0, 0]} />
@@ -206,7 +206,7 @@ export function Analytics() {
             <CartesianGrid vertical={false} stroke={C.grid} />
             <XAxis dataKey="month" {...axisProps} />
             <YAxis {...axisProps} width={40} allowDecimals={false} />
-            <Tooltip contentStyle={tooltipStyle.contentStyle} cursor={{ fill: '#eef5fd' }} />
+            <Tooltip contentStyle={tooltipStyle.contentStyle} cursor={{ fill: '#eef0fc' }} />
             <Legend wrapperStyle={{ fontSize: 12 }} />
             <Bar isAnimationActive={false} dataKey="over" name="С превышением" stackId="a" fill={C.critical} stroke="#fff" strokeWidth={1} />
             <Bar isAnimationActive={false} dataKey="within" name="В пределах ориентира" stackId="a" fill={C.good} stroke="#fff" strokeWidth={1} />

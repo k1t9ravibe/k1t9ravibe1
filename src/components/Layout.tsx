@@ -17,21 +17,23 @@ export function Layout() {
   const { repo, db } = useStore()
   return (
     <div className="flex min-h-screen">
-      <aside className="no-print sticky top-0 flex h-screen w-60 shrink-0 flex-col border-r border-line bg-white">
-        <div className="flex h-14 items-center gap-2.5 border-b border-line px-3">
-          <img src={`${import.meta.env.BASE_URL}kt-emblem.png`} alt="Казахтелеком" className="size-9 shrink-0 object-contain" />
-          <div className="text-[12px] leading-tight font-semibold text-brand-800">
-            Система мониторинга стоимости аренды <span className="font-normal whitespace-nowrap text-slate-500">ver 0.1</span>
+      <aside className="no-print sticky top-0 flex h-screen w-60 shrink-0 flex-col bg-brand-900 text-white">
+        <div className="p-3">
+          <div className="flex items-center gap-2.5 rounded-lg border-2 border-white px-2.5 py-2">
+            <img src={`${import.meta.env.BASE_URL}kt-emblem.png`} alt="Казахтелеком" className="size-9 shrink-0 object-contain" />
+            <div className="text-[12px] leading-tight font-semibold text-white">
+              Система мониторинга стоимости аренды <span className="font-normal whitespace-nowrap text-white/70">ver 0.1</span>
+            </div>
           </div>
         </div>
-        <nav className="flex-1 space-y-0.5 p-2">
+        <nav className="flex-1 space-y-0.5 px-2 pb-2">
           {NAV.map(({ to, label, icon: Icon, end }) => (
             <NavLink
               key={to}
               to={to}
               end={end}
               className={({ isActive }) =>
-                `flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition ${isActive ? 'bg-brand-600 font-medium text-white' : 'text-slate-700 hover:bg-brand-50'}`
+                `flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition ${isActive ? 'bg-white font-semibold text-brand-900' : 'text-white hover:bg-white/10'}`
               }
             >
               <Icon size={17} />
@@ -39,7 +41,7 @@ export function Layout() {
             </NavLink>
           ))}
         </nav>
-        <div className="border-t border-line p-3 text-xs text-slate-500">
+        <div className="border-t border-white/15 p-3 text-xs text-white/70">
           <div className="flex items-center gap-1.5">
             {repo.kind === 'supabase' ? <Cloud size={13} /> : <HardDrive size={13} />}
             {repo.label}
