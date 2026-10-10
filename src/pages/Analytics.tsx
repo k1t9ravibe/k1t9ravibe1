@@ -8,8 +8,9 @@ import { fmtNum } from '../lib/format'
 import { groupSummaries, mean, median, withinPeriod } from '../lib/stats'
 import { Card, PageHeader, Select } from '../components/ui'
 import { PERIODS, periodStart } from '../components/ApplicationsTable'
+import { KzMap } from '../components/KzMap'
 
-// Палитра графиков: категориальные слоты 1–2, статусные цвета и последовательная синяя шкала
+// Палитра графиков: категориальные слоты 1–2 и статусные цвета
 const C = {
   s1: '#2a78d6',
   s2: '#eb6834',
@@ -19,7 +20,6 @@ const C = {
   grid: '#e1e0d9',
   axis: '#898781',
 }
-const SEQ = ['#cde2fb', '#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#184f95']
 
 const axisProps = { tick: { fontSize: 11, fill: C.axis }, axisLine: { stroke: '#c3c2b7' }, tickLine: false } as const
 const tooltipStyle = { contentStyle: { fontSize: 12, borderRadius: 6, border: '1px solid #d6e4f5' }, formatter: (v: unknown) => `${fmtNum(Number(v))} ₸/м²` }
@@ -36,9 +36,13 @@ export function Analytics() {
   const recent = useMemo(() => recentAll.filter((r) => !region || r.region === region), [recentAll, region])
 
   const byRegion = useMemo(() => groupSummaries(recentAll, (r) => r.region, (r) => r.pricePerM2), [recentAll])
-  const medians = REGIONS.map((r) => byRegion.get(r.name)?.median).filter((v): v is number => v != null)
-  const [lo, hi] = medians.length ? [Math.min(...medians), Math.max(...medians)] : [0, 1]
-  const bin = (v: number) => Math.min(SEQ.length - 1, Math.floor(((v - lo) / (hi - lo || 1)) * SEQ.length))
+  const ranking = useMemo(
+    () =>
+      REGIONS.map((r) => ({ name: r.name, short: r.short, median: byRegion.get(r.name)?.median ?? null, count: byRegion.get(r.name)?.count ?? 0 })).sort(
+        (a, b) => (b.median ?? -1) - (a.median ?? -1),
+      ),
+    [byRegion],
+  )
 
   const barData = useMemo(() => {
     if (region) {
@@ -115,17 +119,43 @@ export function Analytics() {
         <Kpi label="Доля заявок с превышением" value={overShare != null ? `${fmtNum(overShare)}%` : '—'} tone="over" hint={`от ${withBenchmark} заявок с ориентиром`} />
       </div>
 
-      <div className="mb-4 grid grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] gap-4">
-        <Card title="Карта: медианная цена за 1 м² по регионам" actions={<span className="text-xs text-slate-500">Нажмите на регион для выбора</span>}>
-          <KzMap byRegion={byRegion} selected={region} onSelect={(n) => setRegion((p) => (p === n ? '' : n))} color={(val) => SEQ[bin(val)]} />
-          <div className="mt-3 flex items-center gap-2 text-xs text-slate-500">
-            <span className="tabular">{fmtNum(lo)} ₸</span>
-            <div className="flex">{SEQ.map((c) => <span key={c} className="h-2.5 w-8" style={{ background: c }} />)}</div>
-            <span className="tabular">{fmtNum(hi)} ₸</span>
-            <span className="ml-3 flex items-center gap-1"><span className="h-2.5 w-4 border border-dashed border-slate-300 bg-white" /> нет данных</span>
-            <span className="ml-auto">Схематичное расположение регионов</span>
-          </div>
+      <div className="mb-4 grid grid-cols-[minmax(0,2.4fr)_minmax(0,1fr)] gap-4">
+        <Card
+          title={`Карта: медианная цена аренды за 1 м²${type ? `, ${type.toLowerCase()}` : ''} (${settings.periodMonths} мес.)`}
+          actions={<span className="text-xs text-slate-500">Нажмите на регион, чтобы выбрать его</span>}
+        >
+          <KzMap stats={byRegion} selected={region} onSelect={(n) => setRegion((p) => (p === n ? '' : n))} />
         </Card>
+        <Card title="Рейтинг регионов по медиане" bodyClass="max-h-[560px] overflow-auto">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr>
+                <th className="th">Регион</th>
+                <th className="th text-right">Медиана, ₸/м²</th>
+                <th className="th text-right">Объектов</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ranking.map((r, i) => (
+                <tr
+                  key={r.name}
+                  onClick={() => setRegion((p) => (p === r.name ? '' : r.name))}
+                  className={`cursor-pointer ${region === r.name ? 'bg-brand-100' : 'hover:bg-brand-50'}`}
+                >
+                  <td className="td">
+                    <span className="mr-2 inline-block w-5 text-right text-xs text-slate-400 tabular">{r.median != null ? i + 1 : ''}</span>
+                    {r.short}
+                  </td>
+                  <td className="td text-right font-medium tabular">{r.median != null ? fmtNum(r.median) : <span className="text-xs font-normal text-slate-400">нет данных</span>}</td>
+                  <td className="td text-right text-slate-500 tabular">{r.count}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
+      </div>
+
+      <div className="mb-4 grid grid-cols-2 gap-4">
         <Card title={sel ? `Средняя и медианная цена по населённым пунктам: ${sel.short}` : 'Средняя и медианная цена за 1 м² по регионам'}>
           <ResponsiveContainer width="100%" height={Math.max(300, barData.length * 22 + 60)}>
             <BarChart data={barData} layout="vertical" margin={{ left: 8, right: 16, top: 4, bottom: 4 }} barGap={2} barCategoryGap="22%">
@@ -139,9 +169,6 @@ export function Analytics() {
             </BarChart>
           </ResponsiveContainer>
         </Card>
-      </div>
-
-      <div className="mb-4 grid grid-cols-2 gap-4">
         <Card title={`Изменение цен по месяцам${sel ? `: ${sel.short}` : ''}${type ? `, ${type.toLowerCase()}` : ''}`}>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={monthly} margin={{ left: 0, right: 16, top: 8, bottom: 0 }}>
@@ -156,6 +183,9 @@ export function Analytics() {
           </ResponsiveContainer>
           <p className="mt-1 text-xs text-slate-500">По дате закупки, последние 18 месяцев</p>
         </Card>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
         <Card title={`Сравнение стоимости по типам помещений${sel ? `: ${sel.short}` : ''}`}>
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={byType} margin={{ left: 0, right: 16, top: 8, bottom: 0 }} barGap={2}>
@@ -169,10 +199,9 @@ export function Analytics() {
             </BarChart>
           </ResponsiveContainer>
         </Card>
-      </div>
 
       <Card title={`Результаты проверки заявок по месяцам${sel ? `: ${sel.short}` : ''}`}>
-        <ResponsiveContainer width="100%" height={240}>
+        <ResponsiveContainer width="100%" height={280}>
           <BarChart data={appsByMonth} margin={{ left: 0, right: 16, top: 8, bottom: 0 }}>
             <CartesianGrid vertical={false} stroke={C.grid} />
             <XAxis dataKey="month" {...axisProps} />
@@ -185,6 +214,7 @@ export function Analytics() {
           </BarChart>
         </ResponsiveContainer>
       </Card>
+      </div>
     </>
   )
 }
@@ -196,39 +226,5 @@ function Kpi({ label, value, hint, tone }: { label: string; value: string; hint?
       <div className={`text-xl font-semibold tabular ${tone === 'over' ? 'text-over' : 'text-slate-900'}`}>{value}</div>
       {hint && <div className="text-xs text-slate-500">{hint}</div>}
     </div>
-  )
-}
-
-function KzMap({ byRegion, selected, onSelect, color }: { byRegion: Map<string, { median: number | null; count: number }>; selected: string; onSelect: (n: string) => void; color: (v: number) => string }) {
-  const W = 96
-  const H = 64
-  const G = 4
-  const [hover, setHover] = useState('')
-  return (
-    <svg viewBox={`0 0 ${7 * W} ${5 * H}`} className="w-full" role="img" aria-label="Схематичная карта регионов Казахстана">
-      {REGIONS.map((r) => {
-        const s = byRegion.get(r.name)
-        const med = s?.median ?? null
-        const fill = med != null ? color(med) : '#ffffff'
-        const dark = med != null && SEQ.indexOf(fill) >= 3
-        const isSel = selected === r.name
-        const dim = selected && !isSel
-        const x = r.map.x * W + G / 2
-        const y = r.map.y * H + G / 2
-        const w = (r.map.w ?? 1) * W - G
-        return (
-          <g key={r.name} className="cursor-pointer" onClick={() => onSelect(r.name)} onMouseEnter={() => setHover(r.name)} onMouseLeave={() => setHover('')} opacity={dim ? 0.45 : 1}>
-            <title>{`${r.name}\nМедиана: ${med != null ? fmtNum(med) + ' ₸/м²' : 'нет данных'}\nОбъектов: ${s?.count ?? 0}`}</title>
-            <rect x={x} y={y} width={w} height={H - G} rx={6} fill={fill} stroke={isSel ? '#0d2f5c' : hover === r.name ? '#0a5cc2' : med != null ? '#ffffff' : '#c3c2b7'} strokeWidth={isSel ? 3 : hover === r.name ? 2 : 1} strokeDasharray={med == null ? '4 3' : undefined} />
-            <text x={x + w / 2} y={y + 24} textAnchor="middle" fontSize={11} fontWeight={600} fill={dark ? '#ffffff' : '#0f2340'}>
-              {r.short}
-            </text>
-            <text x={x + w / 2} y={y + 42} textAnchor="middle" fontSize={11} fill={dark ? '#e6f0fc' : '#52514e'} style={{ fontVariantNumeric: 'tabular-nums' }}>
-              {med != null ? `${fmtNum(med)} ₸` : '—'}
-            </text>
-          </g>
-        )
-      })}
-    </svg>
   )
 }
