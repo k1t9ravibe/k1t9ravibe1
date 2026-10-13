@@ -1,6 +1,6 @@
 ﻿import type { Workbook, Worksheet } from 'exceljs'
 import { REGION_NAMES } from '../data/regions'
-import { PREMISE_TYPES, type PremiseType } from '../types'
+import { normalizePremiseType, type PremiseType } from '../types'
 import { parseNumber } from './format'
 
 type Cell = string | number | null | undefined
@@ -126,7 +126,7 @@ export async function downloadTemplate(kind: 'prices' | 'offers') {
   const sample: Cell[][] =
     kind === 'prices'
       ? [['Актюбинская область', 'Актобе', 'Производственное', 320, 640000, '15.03.2026', 'Договор аренды (закупка из одного источника)', 'Актобе, промзона Северная, 12']]
-      : [['г. Астана', 'Астана', 'Офисное', 'Астана, пр. Республики, 10', 120, 780000, '01.09.2026', 'Krisha.kz (вручную)', 'https://krisha.kz/']]
+      : [['г. Астана', 'Астана', 'Административное', 'Астана, пр. Республики, 10', 120, 780000, '01.09.2026', 'Krisha.kz (вручную)', 'https://krisha.kz/']]
   await exportRows(kind === 'prices' ? 'База цен' : 'Предложения', headers, sample, kind === 'prices' ? 'shablon_baza_cen.xlsx' : 'shablon_predlozheniya.xlsx')
 }
 
@@ -173,7 +173,7 @@ export function validateImport(rows: Record<string, unknown>[], kind: 'prices' |
     const region = String(pick(r, 'Регион') ?? '').trim()
     const settlement = String(pick(r, 'Населённый', 'Населенный') ?? '').trim()
     const typeRaw = String(pick(r, 'Тип') ?? '').trim()
-    const premiseType = PREMISE_TYPES.find((t) => t.toLowerCase() === typeRaw.toLowerCase())
+    const premiseType = normalizePremiseType(typeRaw)
     const area = parseNumber(pick(r, 'Площадь') as string)
     const monthlyCost = parseNumber(pick(r, 'Ежемесячная', 'Стоимость') as string)
     const date = parseDate(pick(r, 'Дата'))

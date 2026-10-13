@@ -23,7 +23,7 @@ function rng(seed: number) {
   }
 }
 
-/** Базовая ставка офисного помещения, ₸/м² в месяц (демонстрационные значения) */
+/** Базовая ставка административного помещения, ₸/м² в месяц (демонстрационные значения) */
 const REGION_BASE: Record<string, number> = {
   'г. Астана': 5600,
   'г. Алматы': 6500,
@@ -48,9 +48,7 @@ const REGION_BASE: Record<string, number> = {
 }
 
 const TYPE_K: Record<PremiseType, number> = {
-  Жилое: 0.9,
-  Офисное: 1,
-  Административное: 0.88,
+  Административное: 0.95,
   Производственное: 0.62,
   Складское: 0.46,
   Техническое: 0.55,
@@ -58,9 +56,7 @@ const TYPE_K: Record<PremiseType, number> = {
 }
 
 const TYPE_AREA: Record<PremiseType, [number, number]> = {
-  Жилое: [35, 140],
-  Офисное: [25, 450],
-  Административное: [80, 700],
+  Административное: [25, 700],
   Производственное: [150, 1500],
   Складское: [120, 2200],
   Техническое: [6, 120],
@@ -85,7 +81,7 @@ function genPriceRecords(r: () => number): PriceRecord[] {
     reg.settlements.forEach((settlement, si) => {
       const cityK = si === 0 ? 1 : 0.78 - si * 0.04
       const isCity = reg.name.startsWith('г.')
-      const types = si === 0 ? PREMISE_TYPES.filter((t) => t !== 'Другое' || isCity) : ['Офисное', 'Складское', 'Жилое'] as PremiseType[]
+      const types = si === 0 ? PREMISE_TYPES.filter((t) => t !== 'Другое' || isCity) : ['Административное', 'Складское'] as PremiseType[]
       for (const type of types) {
         // Пример из ТЗ формируется отдельно
         if (reg.name === 'Актюбинская область' && settlement === 'Актобе' && type === 'Производственное') continue
@@ -142,7 +138,7 @@ function genPriceRecords(r: () => number): PriceRecord[] {
 
 function genMarket(r: () => number): MarketOffer[] {
   const out: MarketOffer[] = []
-  const types: PremiseType[] = ['Офисное', 'Складское', 'Жилое', 'Производственное', 'Административное']
+  const types: PremiseType[] = ['Административное', 'Складское', 'Производственное', 'Техническое']
   for (const reg of REGIONS) {
     const base = REGION_BASE[reg.name] ?? 2500
     const settlement = reg.settlements[0]
@@ -186,30 +182,30 @@ interface AppSpec {
 
 const APP_SPECS: AppSpec[] = [
   { region: 'Актюбинская область', settlement: 'Актобе', type: 'Производственное', area: 300, k: null, monthly: 750000, status: 'На рассмотрении' },
-  { region: 'г. Астана', settlement: 'Астана', type: 'Офисное', area: 180, k: 1.32, status: 'Запрошено обоснование', just: 'requested' },
-  { region: 'г. Алматы', settlement: 'Алматы', type: 'Офисное', area: 95, k: 0.94, status: 'Согласовано' },
+  { region: 'г. Астана', settlement: 'Астана', type: 'Административное', area: 180, k: 1.32, status: 'Запрошено обоснование', just: 'requested' },
+  { region: 'г. Алматы', settlement: 'Алматы', type: 'Административное', area: 95, k: 0.94, status: 'Согласовано' },
   { region: 'г. Шымкент', settlement: 'Шымкент', type: 'Складское', area: 640, k: 1.18, status: 'Обоснование представлено', just: 'answered' },
   { region: 'Карагандинская область', settlement: 'Караганда', type: 'Административное', area: 420, k: 0.97, status: 'На рассмотрении' },
   { region: 'Павлодарская область', settlement: 'Павлодар', type: 'Техническое', area: 24, k: 1.41, status: 'На рассмотрении' },
-  { region: 'Атырауская область', settlement: 'Атырау', type: 'Жилое', area: 72, k: 0.9, status: 'Согласовано' },
+  { region: 'Атырауская область', settlement: 'Атырау', type: 'Административное', area: 72, k: 0.9, status: 'Согласовано' },
   { region: 'Мангистауская область', settlement: 'Актау', type: 'Складское', area: 900, k: 1.12, status: 'Запрошено обоснование', just: 'requested' },
-  { region: 'Восточно-Казахстанская область', settlement: 'Усть-Каменогорск', type: 'Офисное', area: 140, k: 0.99, status: 'На рассмотрении' },
+  { region: 'Восточно-Казахстанская область', settlement: 'Усть-Каменогорск', type: 'Административное', area: 140, k: 0.99, status: 'На рассмотрении' },
   { region: 'Костанайская область', settlement: 'Костанай', type: 'Производственное', area: 1100, k: 0.88, status: 'Согласовано' },
   { region: 'Кызылординская область', settlement: 'Кызылорда', type: 'Другое', area: 60, k: null, monthly: 210000, status: 'На рассмотрении' },
-  { region: 'Жамбылская область', settlement: 'Тараз', type: 'Офисное', area: 65, k: 1.24, status: 'Отклонено' },
+  { region: 'Жамбылская область', settlement: 'Тараз', type: 'Административное', area: 65, k: 1.24, status: 'Отклонено' },
   { region: 'Туркестанская область', settlement: 'Туркестан', type: 'Административное', area: 260, k: 0.92, status: 'На рассмотрении' },
   { region: 'Северо-Казахстанская область', settlement: 'Петропавловск', type: 'Складское', area: 480, k: 1.07, status: 'На рассмотрении' },
-  { region: 'Западно-Казахстанская область', settlement: 'Уральск', type: 'Офисное', area: 110, k: 0.96, status: 'Согласовано' },
+  { region: 'Западно-Казахстанская область', settlement: 'Уральск', type: 'Административное', area: 110, k: 0.96, status: 'Согласовано' },
   { region: 'Акмолинская область', settlement: 'Кокшетау', type: 'Техническое', area: 18, k: 1.29, status: 'Обоснование представлено', just: 'answered' },
   { region: 'Абайская область', settlement: 'Семей', type: 'Производственное', area: 750, k: 0.95, status: 'На рассмотрении' },
-  { region: 'Жетысуская область', settlement: 'Талдыкорган', type: 'Офисное', area: 85, k: 1.16, status: 'На рассмотрении' },
+  { region: 'Жетысуская область', settlement: 'Талдыкорган', type: 'Административное', area: 85, k: 1.16, status: 'На рассмотрении' },
   { region: 'Улытауская область', settlement: 'Жезказган', type: 'Складское', area: 350, k: 0.91, status: 'Согласовано' },
-  { region: 'Алматинская область', settlement: 'Конаев', type: 'Жилое', area: 54, k: 1.05, status: 'На рассмотрении' },
+  { region: 'Алматинская область', settlement: 'Конаев', type: 'Административное', area: 54, k: 1.05, status: 'На рассмотрении' },
   { region: 'г. Астана', settlement: 'Астана', type: 'Складское', area: 1500, k: 0.93, status: 'Согласовано' },
   { region: 'г. Алматы', settlement: 'Алматы', type: 'Техническое', area: 12, k: 1.52, status: 'Запрошено обоснование', just: 'requested' },
-  { region: 'Карагандинская область', settlement: 'Темиртау', type: 'Офисное', area: 70, k: 0.98, status: 'На рассмотрении' },
+  { region: 'Карагандинская область', settlement: 'Темиртау', type: 'Административное', area: 70, k: 0.98, status: 'На рассмотрении' },
   { region: 'Павлодарская область', settlement: 'Экибастуз', type: 'Складское', area: 300, k: 1.09, status: 'На рассмотрении' },
-  { region: 'Актюбинская область', settlement: 'Актобе', type: 'Офисное', area: 160, k: 1.0, status: 'Согласовано' },
+  { region: 'Актюбинская область', settlement: 'Актобе', type: 'Административное', area: 160, k: 1.0, status: 'Согласовано' },
 ]
 
 function genApplications(records: PriceRecord[], offers: MarketOffer[], r: () => number): Application[] {

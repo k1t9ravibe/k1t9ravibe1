@@ -1,8 +1,18 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { buildSeed } from '../data/seed'
-import { DEFAULT_SETTINGS, type DB, type Settings, type TableName } from '../types'
+import { DEFAULT_SETTINGS, normalizePremiseType, type DB, type PremiseType, type Settings, type TableName } from '../types'
 
 type Row = { id: string }
+
+/** Сохранённые ранее данные: офисные → административные, жилые и неизвестные типы отбрасываются */
+function normalizeTypes(db: DB): DB {
+  const fix = <T extends { premiseType: PremiseType }>(rows: T[]) =>
+    rows.flatMap((r) => {
+      const premiseType = normalizePremiseType(r.premiseType)
+      return premiseType ? [{ ...r, premiseType }] : []
+    })
+  return { ...db, applications: fix(db.applications), priceRecords: fix(db.priceRecords), marketOffers: fix(db.marketOffers) }
+}
 
 export interface Repo {
   kind: 'local' | 'supabase'
@@ -33,7 +43,7 @@ class LocalRepo implements Repo {
     if (raw) {
       try {
         const parsed = JSON.parse(raw) as DB
-        this.db = { ...parsed, settings: { ...DEFAULT_SETTINGS, ...parsed.settings } }
+        this.db = normalizeTypes({ ...parsed, settings: { ...DEFAULT_SETTINGS, ...parsed.settings } })
         return structuredClone(this.db)
       } catch {
         console.warn('Повреждённые данные в хранилище, выполняется повторная инициализация')
@@ -151,12 +161,12 @@ class SupabaseRepo implements Repo {
     const camel = (rows: Record<string, unknown>[]) => rows.map((r) => mapKeys(r, toCamel))
     const byDate = (k: string) => (a: Record<string, unknown>, b: Record<string, unknown>) =>
       String(b[k]).localeCompare(String(a[k]))
-    return {
+    return normalizeTypes({
       applications: camel(apps).sort(byDate('createdAt')) as unknown as DB['applications'],
       priceRecords: camel(prices).sort(byDate('purchaseDate')) as unknown as DB['priceRecords'],
       marketOffers: camel(offers).sort(byDate('listedAt')) as unknown as DB['marketOffers'],
       settings: { ...DEFAULT_SETTINGS, ...((settingsRes.data?.data as Partial<Settings>) ?? {}) },
-    }
+    })
   }
 
   async upsert(table: TableName, rows: Row[]) {
