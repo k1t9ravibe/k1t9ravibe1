@@ -51,15 +51,13 @@ const TYPE_K: Record<PremiseType, number> = {
   Административное: 0.95,
   Производственное: 0.62,
   Складское: 0.46,
-  Техническое: 0.55,
   Другое: 0.6,
 }
 
 const TYPE_AREA: Record<PremiseType, [number, number]> = {
   Административное: [25, 700],
-  Производственное: [150, 1500],
+  Производственное: [6, 1500],
   Складское: [120, 2200],
-  Техническое: [6, 120],
   Другое: [30, 300],
 }
 
@@ -138,7 +136,7 @@ function genPriceRecords(r: () => number): PriceRecord[] {
 
 function genMarket(r: () => number): MarketOffer[] {
   const out: MarketOffer[] = []
-  const types: PremiseType[] = ['Административное', 'Складское', 'Производственное', 'Техническое']
+  const types: PremiseType[] = ['Административное', 'Складское', 'Производственное']
   for (const reg of REGIONS) {
     const base = REGION_BASE[reg.name] ?? 2500
     const settlement = reg.settlements[0]
@@ -186,7 +184,7 @@ const APP_SPECS: AppSpec[] = [
   { region: 'г. Алматы', settlement: 'Алматы', type: 'Административное', area: 95, k: 0.94, status: 'Согласовано' },
   { region: 'г. Шымкент', settlement: 'Шымкент', type: 'Складское', area: 640, k: 1.18, status: 'Обоснование представлено', just: 'answered' },
   { region: 'Карагандинская область', settlement: 'Караганда', type: 'Административное', area: 420, k: 0.97, status: 'На рассмотрении' },
-  { region: 'Павлодарская область', settlement: 'Павлодар', type: 'Техническое', area: 24, k: 1.41, status: 'На рассмотрении' },
+  { region: 'Павлодарская область', settlement: 'Павлодар', type: 'Производственное', area: 24, k: 1.41, status: 'На рассмотрении' },
   { region: 'Атырауская область', settlement: 'Атырау', type: 'Административное', area: 72, k: 0.9, status: 'Согласовано' },
   { region: 'Мангистауская область', settlement: 'Актау', type: 'Складское', area: 900, k: 1.12, status: 'Запрошено обоснование', just: 'requested' },
   { region: 'Восточно-Казахстанская область', settlement: 'Усть-Каменогорск', type: 'Административное', area: 140, k: 0.99, status: 'На рассмотрении' },
@@ -196,13 +194,13 @@ const APP_SPECS: AppSpec[] = [
   { region: 'Туркестанская область', settlement: 'Туркестан', type: 'Административное', area: 260, k: 0.92, status: 'На рассмотрении' },
   { region: 'Северо-Казахстанская область', settlement: 'Петропавловск', type: 'Складское', area: 480, k: 1.07, status: 'На рассмотрении' },
   { region: 'Западно-Казахстанская область', settlement: 'Уральск', type: 'Административное', area: 110, k: 0.96, status: 'Согласовано' },
-  { region: 'Акмолинская область', settlement: 'Кокшетау', type: 'Техническое', area: 18, k: 1.29, status: 'Обоснование представлено', just: 'answered' },
+  { region: 'Акмолинская область', settlement: 'Кокшетау', type: 'Производственное', area: 18, k: 1.29, status: 'Обоснование представлено', just: 'answered' },
   { region: 'Абайская область', settlement: 'Семей', type: 'Производственное', area: 750, k: 0.95, status: 'На рассмотрении' },
   { region: 'Жетысуская область', settlement: 'Талдыкорган', type: 'Административное', area: 85, k: 1.16, status: 'На рассмотрении' },
   { region: 'Улытауская область', settlement: 'Жезказган', type: 'Складское', area: 350, k: 0.91, status: 'Согласовано' },
   { region: 'Алматинская область', settlement: 'Конаев', type: 'Административное', area: 54, k: 1.05, status: 'На рассмотрении' },
   { region: 'г. Астана', settlement: 'Астана', type: 'Складское', area: 1500, k: 0.93, status: 'Согласовано' },
-  { region: 'г. Алматы', settlement: 'Алматы', type: 'Техническое', area: 12, k: 1.52, status: 'Запрошено обоснование', just: 'requested' },
+  { region: 'г. Алматы', settlement: 'Алматы', type: 'Производственное', area: 12, k: 1.52, status: 'Запрошено обоснование', just: 'requested' },
   { region: 'Карагандинская область', settlement: 'Темиртау', type: 'Административное', area: 70, k: 0.98, status: 'На рассмотрении' },
   { region: 'Павлодарская область', settlement: 'Экибастуз', type: 'Складское', area: 300, k: 1.09, status: 'На рассмотрении' },
   { region: 'Актюбинская область', settlement: 'Актобе', type: 'Административное', area: 160, k: 1.0, status: 'Согласовано' },

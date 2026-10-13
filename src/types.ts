@@ -2,15 +2,15 @@ export const PREMISE_TYPES = [
   'Административное',
   'Производственное',
   'Складское',
-  'Техническое',
   'Другое',
 ] as const
 export type PremiseType = (typeof PREMISE_TYPES)[number]
 
-/** Приводит тип помещения к справочнику: офисные учитываются как административные, жилые не учитываются (undefined) */
+/** Приводит тип помещения к справочнику: офисные учитываются как административные, технические — как производственные, жилые не учитываются (undefined) */
 export function normalizePremiseType(raw: string): PremiseType | undefined {
   const t = raw.trim().toLowerCase()
   if (t === 'офисное') return 'Административное'
+  if (t === 'техническое') return 'Производственное'
   return PREMISE_TYPES.find((x) => x.toLowerCase() === t)
 }
 
